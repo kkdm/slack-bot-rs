@@ -38,7 +38,7 @@ pub fn send_msg(cli: &RtmClient, channel_id: &String, msg: &str) -> () {
         .send_message(channel_id, msg);
 }
 
-pub fn post(api_server: &String, data: &PostParams) -> Result<PostResponse, String> {
+pub fn post(endpoint: &String, data: &PostParams) -> Result<PostResponse, String> {
     let cli = Client::new();
     let mut headers = HeaderMap::new();
     headers.insert(
@@ -47,7 +47,7 @@ pub fn post(api_server: &String, data: &PostParams) -> Result<PostResponse, Stri
     );
 
     let res = cli
-        .post(api_server)
+        .post(endpoint)
         .headers(headers)
         .json(data)
         .send();

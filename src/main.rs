@@ -57,7 +57,9 @@ impl EventHandler for Handler {
                         subject: "deploy".to_string(),
                         message: t.as_str().to_string(),
                     };
-                    match helper::post(&opt.api_server, &params) {
+                    match helper::post(
+                        &format!("http://{}/publish", &opt.api_server), &params)
+                    {
                         Ok(res) if res.ok => println!("ok: {}", res.message),
                         Ok(res) => println!("failed: {}", res.message),
                         Err(e) => println!("error: {}", e),
