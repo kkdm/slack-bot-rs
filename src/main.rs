@@ -1,6 +1,9 @@
+use env_logger;
+use log::{error, warn, info, debug};
+use std::env;
+use std::process;
 use slack;
-use slack::{RtmClient, Event, EventHandler, Message};
-use slack::api::MessageStandard;
+use slack::{RtmClient, Event, EventHandler};
 use structopt::StructOpt;
 use regex::Regex;
 
@@ -11,8 +14,8 @@ struct Handler;
 #[derive(StructOpt, Debug)]
 #[structopt(name = "slack-bot-rs")]
 pub struct Opt {
-    /// Bot token
-    #[structopt(required = true, short, long)]
+    /// Bot token (env SLACK_TOKEN is also available)
+    #[structopt(short = "t", long = "token", default_value = "")]
     token: String,
 
     /// Bot name
@@ -42,8 +45,8 @@ impl EventHandler for Handler {
                     Regex::new(
                         r"^<@[a-z0-9A-Z]+>\s+deploy\s+(v[0-9]\.[0-9]\.[0-9])\s*$")
                     .unwrap();
+
                 if !re.is_match(&txt.as_str()) {
-                    println!("{}", &txt);
                     helper::send_msg(
                         cli,
                         &channel_id,
@@ -60,9 +63,9 @@ impl EventHandler for Handler {
                     match helper::post(
                         &format!("http://{}/publish", &opt.api_server), &params)
                     {
-                        Ok(res) if res.ok => println!("ok: {}", res.message),
-                        Ok(res) => println!("failed: {}", res.message),
-                        Err(e) => println!("error: {}", e),
+                        Ok(res) if res.ok => info!("ok: {}", res.message),
+                        Ok(res) => error!("failed: {}", res.message),
+                        Err(e) => error!("error: {}", e),
                     };
                 }
             }
@@ -70,18 +73,31 @@ impl EventHandler for Handler {
     }
 
     fn on_close(&mut self, _cli: &RtmClient) {
-        println!("on_close");
+        debug!("on_close");
     }
 
     fn on_connect(&mut self, _cli: &RtmClient) {
-        println!("on_connect");
+        debug!("on_connect");
     }
 }
 
 fn main() {
+    env::set_var("RUST_LOG", "info");
+    env_logger::init();
     let opt = Opt::from_args();
+    
+    let token = 
+        match env::var("SLACK_TOKEN") { 
+            Err(_) if &opt.token == "" => {
+                error!("error: slack token not specified");
+                process::exit(1);
+            },
+            Err(_) => opt.token,
+            Ok(v) => v,
+        };
+
     let mut handler = Handler;
-    let r = RtmClient::login_and_run(&opt.token, &mut handler);
+    let r = RtmClient::login_and_run(&token, &mut handler);
 
     match r {
         Ok(_) => {},

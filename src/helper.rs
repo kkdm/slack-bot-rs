@@ -54,11 +54,11 @@ pub fn post(endpoint: &String, data: &PostParams) -> Result<PostResponse, String
 
     let res_raw =  match res {
         Ok(mut res) => res.json(),
-        Err(e) => return Err(format!("{:?}", e)),
+        Err(e) => return Err(e.to_string()),
     };
 
     match res_raw {
         Ok(res) => Ok(res),
-        Err(e) => return Err(format!("{:?}", e))
+        Err(e) => return Err(e.to_string())
     }
 }

@@ -1,5 +1,5 @@
 [package]
-name = "slack-bot-rs"
+name = "slack-bot"
 version = "0.1.0"
 authors = ["keitaro.kodama <keitaro.kdm@gmail.com>"]
 edition = "2018"
@@ -12,3 +12,5 @@ structopt = "0.3"
 regex = "1"
 reqwest = "0.9.*"
 serde = "*"
+log = "0.4.0"
+env_logger = "0.8.2"
