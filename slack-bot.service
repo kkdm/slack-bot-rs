@@ -10,7 +10,7 @@ User=appuser
 EnvironmentFile=/usr/local/slack-bot/bot.conf
 ExecStart=/usr/local/bin/slack-bot \
     --bot-name ${BOT_NAME} \
-    --api-server ${API_SERVER \
+    --api-server ${API_SERVER} \
     --token ${SLACK_TOKEN}
 
 ExecReload=/bin/kill -SIGUSR1 $MAINPID
