@@ -18,15 +18,14 @@ jobs:
       - name: get tags
         run: git fetch --prune --unshallow --tags
 
+      - name: Check version
+        run: |
+          _VER=`grep version Cargo.toml | egrep -o '[0-9]' | tr -d '\n'`
+          _LAT=`git tag -n1 | egrep -o '[0-9]' | tr -d '\n'`
+          if ((_VER > _LAT)); then exit 0; else exit 1; fi
+          
       - name: Get version
-        run: echo "VERSION=`grep version Cargo.toml | egrep '[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
-
-      - name: Get current version
-        run: echo "LATEST=`git tag -n1 | egrep -o '^v[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
-
-      - name: Exit if version is not higher than current one
-        if: ${{ env.VERSION }} == ${{ env.LATEST }}
-        run: exit 1
+        run: echo "VERSION=`grep version Cargo.toml | egrep -o '[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
 
       - name: Build
         run: make build
