@@ -15,6 +15,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: get tags
+        run: git fetch --prune --unshallow --tags
+
       - name: Get version
         run: echo "VERNUM=`cat version | egrep -o '[0-9]' | tr -d '\n'`" >> $GITHUB_ENV
 
@@ -22,7 +25,7 @@ jobs:
         run: echo "CUR_VERNUM=`git tag -n1 | egrep -o '[0-9]' | tr -d '\n'`" >> $GITHUB_ENV
         
       - name: Exit if version is not higher than 
-        if: ${{ env.VERSION }} < ${{ env.CUR_VERNUM }}
+        if: ${{ env.VERSION }} =< ${{ env.CUR_VERNUM }}
         run: exit
 
       - name: Get version
