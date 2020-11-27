@@ -19,7 +19,7 @@ jobs:
         run: git fetch --prune --unshallow --tags
 
       - name: Get version
-        run: echo "VERSION=`cat version`" >> $GITHUB_ENV
+        run: echo "VERSION=`grep version Cargo.toml | egrep '[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
 
       - name: Get current version
         run: echo "LATEST=`git tag -n1 | egrep -o '^v[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
