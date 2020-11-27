@@ -15,8 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Check version
-        run: git tag | grep "`cat version`" && echo 'version must be higher than current version' && exit 
+      - name: Get version
+        run: echo "VERNUM=`cat version | egrep -o '[0-9]' | tr -d '\n'`" >> $GITHUB_ENV
+
+      - name: Get current version
+        run: echo "CUR_VERNUM=`git tag -n 1 | egrep -o '[0-9]' | tr -d '\n'`" >> $GITHUB_ENV
+        
+      - name: Exit if version is not higher than 
+        if: ${{ env.VERSION }} < ${{ env.CUR_VERNUM }}
+        run: exit
 
       - name: Get version
         run: echo "VERSION=`cat version`" >> $GITHUB_ENV
