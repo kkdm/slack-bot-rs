@@ -1,0 +1,47 @@
+name: Build
+
+on:
+
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check version
+        run: git tag | grep "`cat version`" && echo 'version must be higher than current version' && exit 
+
+      - name: Get version
+        run: echo "VERSION=`cat version`" >> $GITHUB_ENV
+
+      - name: Build
+        run: make build
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./target/release/slack-bot
+          asset_name: slack-bot
+          asset_content_type: application/octet-stream
