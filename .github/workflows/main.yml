@@ -50,6 +50,7 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./target/release/slack-bot
           asset_name: slack-bot
+          asset_content_type: application/octet-stream
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@master
@@ -73,4 +74,3 @@ jobs:
           SLACK_USERNAME: machi
           SLACK_WEBHOOK: ${{ secrets.MACHI_INCOMING_WEBHOOK }}
           MSG_MINIMAL: true
-          asset_content_type: application/octet-stream
