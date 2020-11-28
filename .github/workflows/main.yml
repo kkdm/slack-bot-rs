@@ -50,4 +50,27 @@ jobs:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./target/release/slack-bot
           asset_name: slack-bot
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_CHANNEL: git-notify
+          SLACK_ICON: https://drive.google.com/file/d/1S8oCfEHwrfBlGWhh3mxrE58kDUQpn-Gb/view?usp=sharing
+          SLACK_MESSAGE: "https://github.com/kkdm/slack-bot-rs/releases/download/${{ env.VERSION }}/slack-bot"
+          SLACK_TITLE: Release ${{ env.VERSION }}
+          SLACK_USERNAME: machi
+          SLACK_WEBHOOK: ${{ secrets.MACHI_INCOMING_WEBHOOK }}
+          MSG_MINIMAL: true
+
+      - name: run if fail_step failed
+        if: failure()
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_CHANNEL: git-notify
+          SLACK_ICON: https://drive.google.com/file/d/1S8oCfEHwrfBlGWhh3mxrE58kDUQpn-Gb/view?usp=sharing
+          SLACK_MESSAGE: "https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}"
+          SLACK_TITLE: CI failed...
+          SLACK_USERNAME: machi
+          SLACK_WEBHOOK: ${{ secrets.MACHI_INCOMING_WEBHOOK }}
+          MSG_MINIMAL: true
           asset_content_type: application/octet-stream
