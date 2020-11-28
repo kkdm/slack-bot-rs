@@ -56,7 +56,7 @@ jobs:
         env:
           SLACK_CHANNEL: git-notify
           SLACK_ICON: https://drive.google.com/file/d/1S8oCfEHwrfBlGWhh3mxrE58kDUQpn-Gb/view?usp=sharing
-          SLACK_MESSAGE: "https://github.com/kkdm/slack-bot-rs/releases/download/${{ env.VERSION }}/slack-bot"
+          SLACK_MESSAGE: "https://github.com/${{github.repository}}/releases/download/${{ env.VERSION }}/slack-bot"
           SLACK_TITLE: Release ${{ env.VERSION }}
           SLACK_USERNAME: machi
           SLACK_WEBHOOK: ${{ secrets.MACHI_INCOMING_WEBHOOK }}
@@ -69,7 +69,7 @@ jobs:
           SLACK_CHANNEL: git-notify
           SLACK_ICON: https://drive.google.com/file/d/1S8oCfEHwrfBlGWhh3mxrE58kDUQpn-Gb/view?usp=sharing
           SLACK_MESSAGE: "https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}"
-          SLACK_TITLE: CI failed...
+          SLACK_TITLE: ${{github.repository}} CI failed...
           SLACK_USERNAME: machi
           SLACK_WEBHOOK: ${{ secrets.MACHI_INCOMING_WEBHOOK }}
           MSG_MINIMAL: true
