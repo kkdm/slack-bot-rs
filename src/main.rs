@@ -43,14 +43,14 @@ impl EventHandler for Handler {
 
                 let re = 
                     Regex::new(
-                        r"^<@[a-z0-9A-Z]+>\s+deploy\s+(v[0-9]\.[0-9]\.[0-9])\s*$")
+                        r"^<@[a-z0-9A-Z]+>\s+deploy\s+([a-z0-9A-Z\-\.]+:v[0-9]\.[0-9]\.[0-9])\s*$")
                     .unwrap();
 
                 if !re.is_match(&txt.as_str()) {
                     helper::send_msg(
                         cli,
                         &channel_id,
-                        &format!("<@{}> ```usage: deploy VERSION```", user_id).as_str()
+                        &format!("<@{}> ```usage: deploy DOMAIN:VERSION```", user_id).as_str()
                     );
                     return
                 }              
@@ -77,7 +77,7 @@ impl EventHandler for Handler {
     }
 
     fn on_connect(&mut self, _cli: &RtmClient) {
-        debug!("on_connect");
+        info!("connected");
     }
 }
 
