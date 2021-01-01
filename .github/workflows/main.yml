@@ -18,15 +18,14 @@ jobs:
       - name: get tags
         run: git fetch --prune --unshallow --tags
 
+      - name: Check version
+        run: |
+          _VER=`grep version Cargo.toml | egrep -o '[0-9]' | tr -d '\n'`
+          _LAT=`git tag -n1 | egrep -o '[0-9]' | tr -d '\n'`
+          if ((_VER > _LAT)); then exit 0; else exit 1; fi
+          
       - name: Get version
-        run: echo "VERSION=`grep version Cargo.toml | egrep '[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
-
-      - name: Get current version
-        run: echo "LATEST=`git tag -n1 | egrep -o '^v[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
-
-      - name: Exit if version is not higher than current one
-        if: ${{ env.VERSION }} == ${{ env.LATEST }}
-        run: exit 1
+        run: echo "VERSION=`grep version Cargo.toml | egrep -o '[0-9]\.[0-9]\.[0-9]'`" >> $GITHUB_ENV
 
       - name: Build
         run: make build
@@ -52,3 +51,26 @@ jobs:
           asset_path: ./target/release/slack-bot
           asset_name: slack-bot
           asset_content_type: application/octet-stream
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_CHANNEL: git-notify
+          SLACK_ICON: https://drive.google.com/file/d/1S8oCfEHwrfBlGWhh3mxrE58kDUQpn-Gb/view?usp=sharing
+          SLACK_MESSAGE: "https://github.com/${{github.repository}}/releases/download/${{ env.VERSION }}/slack-bot"
+          SLACK_TITLE: ${{github.repository}} Release ${{ env.VERSION }}
+          SLACK_USERNAME: machi
+          SLACK_WEBHOOK: ${{ secrets.MACHI_INCOMING_WEBHOOK }}
+          MSG_MINIMAL: true
+
+      - name: run if fail_step failed
+        if: failure()
+        uses: rtCamp/action-slack-notify@master
+        env:
+          SLACK_CHANNEL: git-notify
+          SLACK_ICON: https://drive.google.com/file/d/1S8oCfEHwrfBlGWhh3mxrE58kDUQpn-Gb/view?usp=sharing
+          SLACK_MESSAGE: "https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}"
+          SLACK_TITLE: ${{github.repository}} CI failed...
+          SLACK_USERNAME: machi
+          SLACK_WEBHOOK: ${{ secrets.MACHI_INCOMING_WEBHOOK }}
+          MSG_MINIMAL: true
